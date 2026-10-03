@@ -10,7 +10,7 @@ The custom runtime image scan blocks HIGH/CRITICAL findings without hiding unfix
 
 [Docker provider](https://registry.terraform.io/providers/kreuzwerker/docker/3.6.2/docs) and [GitHub deployment environments](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments) are primary references.
 
-`make secrets` scans Git history, staged changes and the current tracked and nonignored source files. Generated ignored local credentials are not publication content, but a forced/staged secret file is still inspected. There is no allowlist for credential-bearing .env paths.
+`make secrets` scans Git history, staged changes and the current tracked and nonignored source files. Generated local credentials remain ignored; a forced/staged credential file is still inspected. There is no allowlist for credential-bearing .env paths.
 
 The runtime uses a digest-pinned Python 3.11 / Alpine 3.24 base. The API dependency stage installs binary musllinux wheels into a virtual environment; only that environment and application source enter the runtime. No compiler or pip/setuptools/wheel is retained. This removes unused Debian system utilities instead of suppressing their findings. The trade-off is musl compatibility: new dependencies must provide matching wheels or require an explicitly reviewed build stage. Native arm64 execution is checked locally; amd64 execution belongs to the first hosted CI run.
 

@@ -1,8 +1,14 @@
 # devops-iac-cicd
 
-Production-like homelab / portfolio project created to practice and demonstrate DevOps/SRE engineering patterns. It is not presented as commercial production experience.
+A local infrastructure delivery workflow with Terraform-owned Docker resources, an alternative Ansible deployment and a small HTTP service exposing release identity.
 
-A complete local release workflow with Terraform-owned Docker infrastructure and an alternative Ansible deployment. No paid cloud resources are provisioned. The small version-reporting HTTP service makes release identity testable; the engineering scope is infrastructure delivery, not application complexity.
+> Personal production-like homelab. This repository is not presented as commercial production infrastructure.
+
+## What this project demonstrates
+
+This project demonstrates modular IaC, environment separation, idempotent configuration, immutable image promotion, smoke checks, explicit approval and rollback boundaries.
+
+## Architecture
 
 ```mermaid
 flowchart LR
@@ -25,7 +31,11 @@ flowchart LR
   approval --> prod[Deploy disposable production lab]
 ```
 
-## Requirements and local start
+## Stack
+
+Python standard library, Docker / Compose, Nginx, Terraform, Ansible, node exporter and GitHub Actions. Ruff, ShellCheck, yamllint, Hadolint, actionlint, Gitleaks and Trivy validate the delivery workflow.
+
+## Quick start
 
 Docker Engine, Compose, Python 3.11, Make, Terraform >=1.6, shellcheck, yamllint, hadolint and gitleaks. `make install` installs the Python tools, including Ansible. No repository credentials are needed locally.
 
@@ -54,9 +64,9 @@ Ansible's second unchanged run should report `changed=0`; verify it yourself rat
 
 `.github/workflows/pipeline.yml` runs lint, tests, image build, Trivy report and blocking secret scan, then deploys stage and smoke-tests it. The tar artifact preserves the exact commit-tagged image across independent runners. Production requires manually dispatching the workflow on main with `approve_production=true`, and uses the `production` environment. Configure required reviewers in GitHub's environment settings for independent approval. YAML cannot create that protection rule. Without it, the explicit dispatcher approval is the only gate. See [GitHub environments](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments).
 
-Stage/prod are short-lived Docker infrastructure on the job's runner and are destroyed at job completion; this is a delivery exercise, not a persistent hosted service. A real deployment requires trusted deployment runners or remote Docker access and persistent remote state. Trivy blocks HIGH/CRITICAL findings in the custom runtime image; secret detection also blocks. No global severity ignore or vulnerability allowlist is used. No check badge is shown before the repository and its checks exist.
+Stage/prod are short-lived Docker infrastructure on the job's runner and are destroyed at job completion; this is a delivery exercise, not a persistent hosted service. A real deployment requires trusted deployment runners or remote Docker access and persistent remote state. Trivy blocks HIGH/CRITICAL findings in the custom runtime image; secret detection also blocks. No global severity ignore or vulnerability allowlist is used.
 
-## Remote state and secrets
+## Remote state and security
 
 Separate local states are ignored by Git. `terraform/remote-state.tf.disabled` supplies an HTTP backend block to copy into each environment when a state service exists. Configure the real state address through `TF_HTTP_ADDRESS` using your own endpoint, plus lock_address/unlock_address and HTTP authentication environment variables. Do not commit credential-bearing backend arguments. The required endpoint is deployment-specific and is not guessed here. Use distinct addresses for each environment and `TF_HTTP_LOCK_ADDRESS`, `TF_HTTP_UNLOCK_ADDRESS`, `TF_HTTP_USERNAME`, `TF_HTTP_PASSWORD` from protected variables. State migration requires a backup, restricted ACLs, encryption, locking and a restore rehearsal. Never use a shared state key for stage and prod.
 
@@ -87,12 +97,17 @@ terraform -chdir=terraform/environments/prod destroy
 docker compose -f artifacts/ansible-dev/compose.yaml down
 ```
 
-See [VALIDATION.md](VALIDATION.md) and [docs/decisions.md](docs/decisions.md).
+## Observability and limitations
 
-## What this project demonstrates
+The Ansible deployment exposes node exporter on loopback port 9104. On Docker Desktop its CPU/RAM/network metrics describe the Linux VM. This project focuses on release identity and infrastructure convergence; it does not include a Prometheus/Grafana stack. Remote Linux installation, remote state recovery, hosted CI execution and persistent remote deployment remain untested. Release replacement can interrupt requests.
 
-This project demonstrates modular IaC, environment separation, idempotent configuration, immutable image promotion, smoke checks, explicit approval and rollback boundaries.
+## Validation
 
-See [local image security findings](docs/security-scan.md) and [publishable repository tree](TREE.txt).
+[VALIDATION.md](VALIDATION.md) records observed local results and NOT TESTED items. Run `make test lint secrets` for application tests, static checks and secret scanning. Hosted GitHub Actions execution has not been tested.
 
-See [SECURITY.md](SECURITY.md) for the audited image scope and remaining security limitations.
+## Documentation
+
+- [Validation results](VALIDATION.md)
+- [Security scope and remaining risks](SECURITY.md)
+- [Image scan summary](docs/security-scan.md)
+- [Architecture decisions](docs/decisions.md)

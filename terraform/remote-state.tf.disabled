@@ -1,4 +1,4 @@
-# Enable in each environment only after provisioning your own trusted state server.
+# Enable in each environment only after provisioning a trusted state server.
 # HTTP backend authentication comes from TF_HTTP_USERNAME / TF_HTTP_PASSWORD.
 terraform {
   backend "http" {}

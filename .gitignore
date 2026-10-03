@@ -15,3 +15,12 @@ artifacts/
 *.retry
 *.pem
 *.key
+.DS_Store
+.idea/
+.vscode/
+*.bak
+*.tmp
+*.orig
+*~
+*.log
+*.pyc
