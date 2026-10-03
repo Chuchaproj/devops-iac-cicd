@@ -1,0 +1,79 @@
+devops-iac-cicd/
+├── .dockerignore
+├── .env.example
+├── .github/
+│   └── workflows/
+│       └── pipeline.yml
+├── .gitignore
+├── .gitleaks.toml
+├── .pre-commit-config.yaml
+├── .yamllint
+├── Dockerfile
+├── LICENSE
+├── Makefile
+├── README.md
+├── TREE.txt
+├── VALIDATION.md
+├── ansible/
+│   ├── ansible.cfg
+│   ├── group_vars/
+│   │   └── all.yml
+│   ├── inventory/
+│   │   └── local.yml
+│   ├── roles/
+│   │   ├── application/
+│   │   │   ├── handlers/
+│   │   │   │   └── main.yml
+│   │   │   ├── tasks/
+│   │   │   │   └── main.yml
+│   │   │   └── templates/
+│   │   │       └── compose.yaml.j2
+│   │   ├── docker/
+│   │   │   └── tasks/
+│   │   │       └── main.yml
+│   │   ├── monitoring/
+│   │   │   ├── tasks/
+│   │   │   │   └── main.yml
+│   │   │   └── templates/
+│   │   │       └── monitoring.env.j2
+│   │   └── nginx/
+│   │       ├── tasks/
+│   │       │   └── main.yml
+│   │       └── templates/
+│   │           └── nginx.conf.j2
+│   └── site.yml
+├── app/
+│   ├── __init__.py
+│   └── server.py
+├── compose.yaml
+├── docs/
+│   ├── decisions.md
+│   └── security-scan.md
+├── nginx/
+│   └── nginx.conf
+├── pyproject.toml
+├── requirements-dev.txt
+├── scripts/
+│   ├── check-secrets.sh
+│   ├── deploy.sh
+│   ├── rollback.sh
+│   └── smoke.py
+├── terraform/
+│   ├── environments/
+│   │   ├── dev/
+│   │   │   ├── .terraform.lock.hcl
+│   │   │   └── main.tf
+│   │   ├── prod/
+│   │   │   ├── .terraform.lock.hcl
+│   │   │   └── main.tf
+│   │   └── stage/
+│   │       ├── .terraform.lock.hcl
+│   │       └── main.tf
+│   ├── modules/
+│   │   ├── compute/
+│   │   │   └── main.tf
+│   │   └── network/
+│   │       └── main.tf
+│   └── remote-state.tf.disabled
+└── tests/
+    └── test_server.py

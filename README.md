@@ -88,3 +88,5 @@ docker compose -f artifacts/ansible-dev/compose.yaml down
 ```
 
 See [VALIDATION.md](VALIDATION.md) and [docs/decisions.md](docs/decisions.md). This project demonstrates modular IaC, environment separation, idempotent configuration, immutable image promotion, smoke checks, explicit approval and rollback boundaries.
+
+See [local image security findings](docs/security-scan.md) and [publishable repository tree](TREE.txt).
