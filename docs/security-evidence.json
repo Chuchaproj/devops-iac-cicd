@@ -2508,5 +2508,56 @@
       "Name": "3.24.2"
     },
     "findings": []
+  },
+  "stale_local_tag": {
+    "image_id": "sha256:322975e98192f982b8c5d499715bc1463a2dad74d5dd730a526031de68858119",
+    "total_high": 47,
+    "extra_high": [
+      {
+        "VulnerabilityID": "CVE-2026-103111",
+        "PkgName": "libpcre2-8-0",
+        "InstalledVersion": "10.46-1~deb13u2",
+        "FixedVersion": "10.46-1~deb13u3",
+        "Severity": "HIGH",
+        "Status": "fixed",
+        "PkgPath": null,
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-103111",
+        "Layer": {
+          "Digest": "sha256:bd36565c0fdebaf0f3af5c3b4ce610ca085ced32e9e9da850d95912f5f18f47b",
+          "DiffID": "sha256:8227a1264c7ff2f8bd125b585e62c1cec77dd2099c985c33e08d34292d06144f"
+        },
+        "origin": "base OS"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-23949",
+        "PkgName": "jaraco.context",
+        "InstalledVersion": "5.3.0",
+        "FixedVersion": "6.1.0",
+        "Severity": "HIGH",
+        "Status": "fixed",
+        "PkgPath": "usr/local/lib/python3.11/site-packages/setuptools/_vendor/jaraco.context-5.3.0.dist-info/METADATA",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-23949",
+        "Layer": {
+          "Digest": "sha256:d3268b1a5a40ab94050bde714bc79029daa1f56f06e8259fb68ba9872e1ed069",
+          "DiffID": "sha256:3f6f9a52d29434343f27339f47a941943cf4ee6e5093ccc582cae9cad0768aa0"
+        },
+        "origin": "base setuptools vendored dependency"
+      },
+      {
+        "VulnerabilityID": "CVE-2026-24049",
+        "PkgName": "wheel",
+        "InstalledVersion": "0.45.1",
+        "FixedVersion": "0.46.2",
+        "Severity": "HIGH",
+        "Status": "fixed",
+        "PkgPath": "usr/local/lib/python3.11/site-packages/setuptools/_vendor/wheel-0.45.1.dist-info/METADATA",
+        "PrimaryURL": "https://avd.aquasec.com/nvd/cve-2026-24049",
+        "Layer": {
+          "Digest": "sha256:d3268b1a5a40ab94050bde714bc79029daa1f56f06e8259fb68ba9872e1ed069",
+          "DiffID": "sha256:3f6f9a52d29434343f27339f47a941943cf4ee6e5093ccc582cae9cad0768aa0"
+        },
+        "origin": "base setuptools vendored dependency"
+      }
+    ]
   }
 }

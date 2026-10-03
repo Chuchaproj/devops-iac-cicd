@@ -17,7 +17,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-  lint --> tests --> build --> scan[Security report / secret gate]
+  lint --> tests --> build --> scan[Image vulnerability and secret gates]
   scan --> image[Immutable Docker image artifact]
   image --> stage[Deploy stage]
   stage --> smoke[Smoke test]
