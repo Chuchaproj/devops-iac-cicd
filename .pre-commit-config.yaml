@@ -33,6 +33,6 @@ repos:
         pass_filenames: false
       - id: secrets
         name: Gitleaks scan
-        entry: gitleaks dir . --redact
+        entry: gitleaks git --pre-commit --staged --redact
         language: system
         pass_filenames: false

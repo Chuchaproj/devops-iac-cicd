@@ -31,3 +31,7 @@ rollback:
 	bash scripts/rollback.sh $(ENV) $(IMAGE)
 ansible:
 	cd ansible && ../.venv/bin/ansible-playbook site.yml
+
+.PHONY: secrets
+secrets:
+	bash scripts/check-secrets.sh

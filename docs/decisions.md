@@ -9,3 +9,5 @@ The backend is stateless so release smoke tests can assert commit identity. Ngin
 The scan intentionally reports upstream vulnerabilities without hiding them or claiming a clean image. The release gate blocks leaked secrets, broken lint/tests and failed smoke checks. Further vulnerability policy needs severity, reachability, exceptions and expiry decisions.
 
 [Docker provider](https://registry.terraform.io/providers/kreuzwerker/docker/3.6.0/docs) and [GitHub deployment environments](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments) are primary references.
+
+`make secrets` scans Git history, staged changes and an exported tracked source tree. Generated ignored local credentials are not publication content, but a forced/staged secret file is still inspected. There is no allowlist for credential-bearing .env paths.
