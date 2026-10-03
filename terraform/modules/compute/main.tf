@@ -19,11 +19,12 @@ resource "docker_image" "nginx" {
   keep_locally = true
 }
 resource "docker_container" "backend" {
-  name      = "iac-${var.environment}-backend"
-  image     = var.image
-  env       = ["APP_ENV=${var.environment}", "RELEASE=${var.image}"]
-  read_only = true
-  memory    = 128
+  name        = "iac-${var.environment}-backend"
+  image       = var.image
+  env         = ["APP_ENV=${var.environment}", "RELEASE=${var.image}"]
+  read_only   = true
+  memory      = 128
+  memory_swap = 256
   networks_advanced {
     name    = var.private_network
     aliases = ["backend"]
@@ -32,9 +33,10 @@ resource "docker_container" "backend" {
   security_opts = ["no-new-privileges:true"]
 }
 resource "docker_container" "nginx" {
-  name   = "iac-${var.environment}-nginx"
-  image  = docker_image.nginx.image_id
-  memory = 128
+  name        = "iac-${var.environment}-nginx"
+  image       = docker_image.nginx.image_id
+  memory      = 128
+  memory_swap = 256
   networks_advanced { name = var.private_network }
   networks_advanced { name = var.edge_network }
   ports {
