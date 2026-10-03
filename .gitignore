@@ -1,0 +1,15 @@
+.env
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.ansible/
+artifacts/
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars.json
+*.retry
+*.pem
+*.key
