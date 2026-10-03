@@ -12,6 +12,7 @@ devops-iac-cicd/
 ├── LICENSE
 ├── Makefile
 ├── README.md
+├── SECURITY.md
 ├── TREE.txt
 ├── VALIDATION.md
 ├── ansible/
@@ -48,6 +49,7 @@ devops-iac-cicd/
 ├── compose.yaml
 ├── docs/
 │   ├── decisions.md
+│   ├── security-evidence.json
 │   └── security-scan.md
 ├── nginx/
 │   └── nginx.conf

@@ -1,6 +1,6 @@
 # devops-iac-cicd
 
-Production-like homelab project created to practice and demonstrate DevOps/SRE engineering patterns. It is not presented as commercial production experience.
+Production-like homelab / portfolio project created to practice and demonstrate DevOps/SRE engineering patterns. It is not presented as commercial production experience.
 
 A complete local release workflow with Terraform-owned Docker infrastructure and an alternative Ansible deployment. No paid cloud resources are provisioned. The small version-reporting HTTP service makes release identity testable; the engineering scope is infrastructure delivery, not application complexity.
 
@@ -54,11 +54,11 @@ Ansible's second unchanged run should report `changed=0`; verify it yourself rat
 
 `.github/workflows/pipeline.yml` runs lint, tests, image build, Trivy report and blocking secret scan, then deploys stage and smoke-tests it. The tar artifact preserves the exact commit-tagged image across independent runners. Production requires manually dispatching the workflow on main with `approve_production=true`, and uses the `production` environment. Configure required reviewers in GitHub's environment settings for independent approval. YAML cannot create that protection rule. Without it, the explicit dispatcher approval is the only gate. See [GitHub environments](https://docs.github.com/en/actions/reference/workflows-and-actions/deployments-and-environments).
 
-Stage/prod are short-lived Docker infrastructure on the job's runner and are destroyed at job completion; this is a delivery exercise, not a persistent hosted service. A real deployment requires trusted deployment runners or remote Docker access and persistent remote state. Trivy produces a non-blocking vulnerability report because upstream base-image findings need triage; secret detection blocks. No check badge is shown before the repository and its checks exist.
+Stage/prod are short-lived Docker infrastructure on the job's runner and are destroyed at job completion; this is a delivery exercise, not a persistent hosted service. A real deployment requires trusted deployment runners or remote Docker access and persistent remote state. Trivy blocks HIGH/CRITICAL findings in the custom runtime image; secret detection also blocks. No global severity ignore or vulnerability allowlist is used. No check badge is shown before the repository and its checks exist.
 
 ## Remote state and secrets
 
-Separate local states are ignored by Git. `terraform/remote-state.tf.disabled` supplies an HTTP backend block to enable in each environment when a state service exists. Configure `-backend-config=address=...` using your own endpoint, plus lock_address/unlock_address and HTTP authentication environment variables. Do not commit credential-bearing backend arguments. The required endpoint is deployment-specific and is not guessed here. State migration requires a backup, restricted ACLs, encryption, locking and a restore rehearsal. Never use a shared state key for stage and prod.
+Separate local states are ignored by Git. `terraform/remote-state.tf.disabled` supplies an HTTP backend block to copy into each environment when a state service exists. Configure the real state address through `TF_HTTP_ADDRESS` using your own endpoint, plus lock_address/unlock_address and HTTP authentication environment variables. Do not commit credential-bearing backend arguments. The required endpoint is deployment-specific and is not guessed here. Use distinct addresses for each environment and `TF_HTTP_LOCK_ADDRESS`, `TF_HTTP_UNLOCK_ADDRESS`, `TF_HTTP_USERNAME`, `TF_HTTP_PASSWORD` from protected variables. State migration requires a backup, restricted ACLs, encryption, locking and a restore rehearsal. Never use a shared state key for stage and prod.
 
 The sample service needs no password. `.env.example` lists deployment configuration, not secrets. SSH keys and registry/state credentials belong in protected CI secrets or an external secret store. Remote Docker grants root-equivalent access: use SSH/TLS and a dedicated host, never an unauthenticated TCP listener. Loopback publishing and internal Docker networking are local security rules, not a cloud VPC/firewall implementation; Docker-published ports can bypass host UFW rules.
 
@@ -87,6 +87,12 @@ terraform -chdir=terraform/environments/prod destroy
 docker compose -f artifacts/ansible-dev/compose.yaml down
 ```
 
-See [VALIDATION.md](VALIDATION.md) and [docs/decisions.md](docs/decisions.md). This project demonstrates modular IaC, environment separation, idempotent configuration, immutable image promotion, smoke checks, explicit approval and rollback boundaries.
+See [VALIDATION.md](VALIDATION.md) and [docs/decisions.md](docs/decisions.md).
+
+## What this project demonstrates
+
+This project demonstrates modular IaC, environment separation, idempotent configuration, immutable image promotion, smoke checks, explicit approval and rollback boundaries.
 
 See [local image security findings](docs/security-scan.md) and [publishable repository tree](TREE.txt).
+
+See [SECURITY.md](SECURITY.md) for the audited image scope and remaining security limitations.
