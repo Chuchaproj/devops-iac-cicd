@@ -1,0 +1,93 @@
+name: delivery
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      approve_production:
+        description: Explicitly approve this commit for a disposable production lab deployment
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: delivery-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - uses: hashicorp/setup-terraform@v3
+        with: {terraform_version: '1.16.4'}
+      - run: sudo apt-get update && sudo apt-get install -y shellcheck yamllint
+      - run: make install
+      - uses: hadolint/hadolint-action@v3.1.0
+        with: {dockerfile: Dockerfile}
+      - run: .venv/bin/ruff check app tests scripts && shellcheck scripts/*.sh && yamllint -c .yamllint compose.yaml ansible .github
+      - run: .venv/bin/ansible-lint ansible/site.yml && terraform fmt -check -recursive terraform && make validate
+  tests:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.11'}
+      - run: make install test
+  build:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t iac-backend:${{ github.sha }} . && docker save iac-backend:${{ github.sha }} -o image.tar
+      - uses: actions/upload-artifact@v4
+        with: {name: image, path: image.tar, retention-days: 7}
+  security:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: {name: image}
+      - run: docker load -i image.tar
+      - uses: aquasecurity/trivy-action@0.30.0
+        with:
+          image-ref: iac-backend:${{ github.sha }}
+          format: table
+          severity: CRITICAL,HIGH
+          exit-code: '0'
+      - uses: actions/checkout@v4
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  stage:
+    needs: security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with: {terraform_version: '1.16.4'}
+      - uses: actions/download-artifact@v4
+        with: {name: image}
+      - run: docker load -i image.tar
+      - run: bash scripts/deploy.sh stage iac-backend:${{ github.sha }}
+      - run: python3 scripts/smoke.py http://127.0.0.1:8082
+      - if: always()
+        run: terraform -chdir=terraform/environments/stage destroy -auto-approve -input=false
+  production:
+    needs: stage
+    if: github.event_name == 'workflow_dispatch' && inputs.approve_production && github.ref == 'refs/heads/main'
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with: {terraform_version: '1.16.4'}
+      - uses: actions/download-artifact@v4
+        with: {name: image}
+      - run: docker load -i image.tar
+      - run: bash scripts/deploy.sh prod iac-backend:${{ github.sha }}
+      - run: python3 scripts/smoke.py http://127.0.0.1:8083
+      - if: always()
+        run: terraform -chdir=terraform/environments/prod destroy -auto-approve -input=false
