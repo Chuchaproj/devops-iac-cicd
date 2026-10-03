@@ -14,7 +14,7 @@ lint:
 	.venv/bin/ansible-lint ansible/site.yml
 	terraform fmt -check -recursive terraform
 build:
-	docker build -t $(IMAGE) .
+	docker build --provenance=false -t $(IMAGE) .
 up:
 	docker compose up -d --build --wait
 down:

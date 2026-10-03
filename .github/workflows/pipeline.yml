@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker build -t iac-backend:${{ github.sha }} . && docker save iac-backend:${{ github.sha }} -o image.tar
+      - run: docker build --provenance=false -t iac-backend:${{ github.sha }} . && docker save iac-backend:${{ github.sha }} -o image.tar
       - uses: actions/upload-artifact@v4
         with: {name: image, path: image.tar, retention-days: 7}
   security:

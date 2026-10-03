@@ -1,7 +1,7 @@
 services:
   backend:
     image: ${APP_IMAGE:-iac-backend:local}
-    build: .
+    build: {context: ., provenance: false}
     environment:
       APP_ENV: ${APP_ENV:-dev}
       RELEASE: ${RELEASE:-local}
