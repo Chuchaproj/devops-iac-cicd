@@ -1,0 +1,22 @@
+- name: Render versioned application deployment
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: "{{ deploy_root }}/compose.yaml"
+    mode: '0600'
+  notify: Apply compose deployment
+- name: Apply any notified changes before health check
+  ansible.builtin.meta: flush_handlers
+- name: Reconcile stopped or missing containers
+  ansible.builtin.command:
+    cmd: docker compose up -d --wait --wait-timeout 120
+    chdir: "{{ deploy_root }}"
+  register: application_reconcile
+  changed_when: "'Started' in application_reconcile.stderr or 'Created' in application_reconcile.stderr"
+- name: Check application health through Nginx
+  ansible.builtin.uri:
+    url: "http://127.0.0.1:{{ http_port }}/health"
+    status_code: 200
+  register: application_health
+  retries: 10
+  delay: 2
+  until: application_health.status == 200

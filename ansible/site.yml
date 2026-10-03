@@ -1,0 +1,9 @@
+- name: Configure isolated deployment
+  hosts: all
+  gather_facts: true
+  roles:
+    - role: docker
+      when: install_docker | bool
+    - role: nginx
+    - role: monitoring
+    - role: application

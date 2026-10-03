@@ -1,0 +1,6 @@
+app_environment: dev
+app_image: iac-backend:local
+app_release: local
+http_port: 8084
+install_docker: false
+deploy_root: "{{ playbook_dir }}/../artifacts/ansible-dev"

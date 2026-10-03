@@ -1,0 +1,11 @@
+- name: Create deployment directory
+  ansible.builtin.file:
+    path: "{{ deploy_root }}"
+    state: directory
+    mode: '0700'
+- name: Render Nginx reverse proxy configuration
+  ansible.builtin.template:
+    src: nginx.conf.j2
+    dest: "{{ deploy_root }}/nginx.conf"
+    mode: '0644'
+  notify: Apply compose deployment
