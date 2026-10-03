@@ -56,7 +56,7 @@ jobs:
           image-ref: iac-backend:${{ github.sha }}
           format: table
           severity: CRITICAL,HIGH
-          exit-code: '0'
+          exit-code: '1'
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}
       - uses: gitleaks/gitleaks-action@v2
@@ -73,7 +73,7 @@ jobs:
         with: {name: image}
       - run: docker load -i image.tar
       - run: bash scripts/deploy.sh stage iac-backend:${{ github.sha }}
-      - run: python3 scripts/smoke.py http://127.0.0.1:8082
+      - run: EXPECTED_RELEASE=iac-backend:${{ github.sha }} python3 scripts/smoke.py http://127.0.0.1:8082
       - if: always()
         run: terraform -chdir=terraform/environments/stage destroy -auto-approve -input=false
   production:
@@ -89,6 +89,6 @@ jobs:
         with: {name: image}
       - run: docker load -i image.tar
       - run: bash scripts/deploy.sh prod iac-backend:${{ github.sha }}
-      - run: python3 scripts/smoke.py http://127.0.0.1:8083
+      - run: EXPECTED_RELEASE=iac-backend:${{ github.sha }} python3 scripts/smoke.py http://127.0.0.1:8083
       - if: always()
         run: terraform -chdir=terraform/environments/prod destroy -auto-approve -input=false
