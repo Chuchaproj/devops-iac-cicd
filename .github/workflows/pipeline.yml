@@ -51,7 +51,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with: {name: image}
       - run: docker load -i image.tar
-      - uses: aquasecurity/trivy-action@0.30.0
+      - uses: aquasecurity/trivy-action@6c175e9c4083a92bbca2f9724c8a5e33bc2d97a5  # v0.30.0
         with:
           image-ref: iac-backend:${{ github.sha }}
           format: table
@@ -59,9 +59,16 @@ jobs:
           exit-code: '1'
       - uses: actions/checkout@v4
         with: {fetch-depth: 0}
-      - uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install Gitleaks
+        run: |
+          cd "$RUNNER_TEMP"
+          curl -fsSLO https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_linux_x64.tar.gz
+          curl -fsSLO https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_checksums.txt
+          sha256sum --ignore-missing -c gitleaks_8.30.0_checksums.txt
+          tar -xzf gitleaks_8.30.0_linux_x64.tar.gz gitleaks
+          sudo install -m 0755 gitleaks /usr/local/bin/gitleaks
+      - name: Scan complete history and current sources
+        run: make secrets
   stage:
     needs: security
     runs-on: ubuntu-latest
